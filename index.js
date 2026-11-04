@@ -96,6 +96,36 @@ app.get("/", (req, res) => {
 //   }
 // });
 
+// Get All Upcoming Events
+// app.get("/api/events", async (req, res) => {
+//   try {
+//     const result = await eventsCollection
+//       .find({
+//         eventDate: { $gt: new Date().toISOString() },
+//       })
+//       .sort({ eventDate: 1 })
+//       .toArray();
+
+//     res.send(result);
+//   } catch (error) {
+//     res.status(500).send({
+//       success: false,
+//       message: "Failed to get events!",
+//     });
+//   }
+// });
+
+// Get Signle event
+
+// Create Event
+app.post("/api/events", verifyToken, async (req, res) => {
+  const data = req.body;
+  data.createdBy = req.user.email.toLowerCase();
+  data.createdAt = new Date().toISOString();
+  const result = await eventsCollection.insertOne(data);
+  res.send(result);
+});
+
 app.listen(port, () => {
   console.log(`Impactora API running on port ${port}`);
 });
