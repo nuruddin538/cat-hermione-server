@@ -227,6 +227,28 @@ app.get("/api/my-events", verifyToken, async (req, res) => {
   res.send(result);
 });
 
+// update my event
+app.patch("/api/my-events/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  const email = req.user.email.toLowerCase();
+
+  delete data._id;
+  delete data.createdBy;
+  delete data.createdAt;
+
+  const result = await eventsCollection.updateOne(
+    {
+      _id: new ObjectId(id),
+      createdBy: email,
+    },
+    {
+      $set: data,
+    }
+  );
+  res.send(result);
+});
+
 app.listen(port, () => {
   console.log(`Impactora API running on port ${port}`);
 });
