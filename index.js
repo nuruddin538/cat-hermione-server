@@ -123,7 +123,6 @@ app.get("/api/events/:id", async (req, res) => {
   });
   res.send(result);
 });
-// 6. Create E
 
 // Create Event
 app.post("/api/events", verifyToken, async (req, res) => {
@@ -131,6 +130,38 @@ app.post("/api/events", verifyToken, async (req, res) => {
   data.createdBy = req.user.email.toLowerCase();
   data.createdAt = new Date().toISOString();
   const result = await eventsCollection.insertOne(data);
+  res.send(result);
+});
+
+// Join Event
+app.post("/api/events/:id/join", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const email = req.user.email.toLowerCase();
+  const event = await eventsCollection.findOne({
+    _id: new ObjectId(id),
+  });
+  if (!event) {
+    return res.status(404).send({ message: "Event not found!" });
+  }
+
+  const alreadyJoined = await joinedEventsCollection.findOne({
+    eventId: id,
+    email,
+  });
+  if (alreadyJoined) {
+    return res.status(400).send({
+      message: "You have already joined this event!",
+    });
+  }
+
+  const data = {
+    eventId: id,
+    eventTitle: event.title,
+    userId: req.user.sub || email,
+    email,
+    joinedAt: new Date().toISOString(),
+  };
+  const result = await joinedEventsCollection.insertOne(data);
   res.send(result);
 });
 
