@@ -87,7 +87,10 @@ app.get("/api/events/recent", async (req, res) => {
       .limit(6)
       .toArray();
 
-    res.send(result);
+    res.send({
+      success: true,
+      events: result,
+    });
   } catch (error) {
     res.status(500).send({
       success: false,
@@ -106,7 +109,10 @@ app.get("/api/events", async (req, res) => {
       .sort({ eventDate: 1 })
       .toArray();
 
-    res.send(result);
+    res.send({
+      success: true,
+      events: result,
+    });
   } catch (error) {
     res.status(500).send({
       success: false,
@@ -121,7 +127,10 @@ app.get("/api/events/:id", async (req, res) => {
   const result = await eventsCollection.findOne({
     _id: new ObjectId(id),
   });
-  res.send(result);
+  res.send({
+    success: true,
+    event: result,
+  });
 });
 
 // Create Event
@@ -130,7 +139,11 @@ app.post("/api/events", verifyToken, async (req, res) => {
   data.createdBy = req.user.email.toLowerCase();
   data.createdAt = new Date().toISOString();
   const result = await eventsCollection.insertOne(data);
-  res.send(result);
+  res.send({
+    success: true,
+    message: "Event created successfully!",
+    insertedId: result.insertedId,
+  });
 });
 
 // Join Event
@@ -216,7 +229,10 @@ app.get("/api/my-joined-events", verifyToken, async (req, res) => {
       },
     ])
     .toArray();
-  res.send(result);
+  res.send({
+    success: true,
+    events: result,
+  });
 });
 
 // Get current users events
@@ -224,7 +240,10 @@ app.get("/api/my-events", verifyToken, async (req, res) => {
   const email = req.user.email.toLowerCase();
   const result = await eventsCollection.find({ createdBy: email }).toArray();
 
-  res.send(result);
+  res.send({
+    success: true,
+    events: result,
+  });
 });
 
 // update my event
@@ -246,7 +265,10 @@ app.patch("/api/my-events/:id", verifyToken, async (req, res) => {
       $set: data,
     }
   );
-  res.send(result);
+  res.send({
+    success: true,
+    message: "Event updated successfully!",
+  });
 });
 
 // Delete my Event
