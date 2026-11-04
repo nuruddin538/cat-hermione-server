@@ -179,41 +179,52 @@ app.get("/api/my-events/:email", verifyToken, async (req, res) => {
 // Get my joined events
 app.get("/api/my-joined-events", verifyToken, async (req, res) => {
   const email = req.user.email.toLowerCase();
-  const result = await joinedEventsCollection.aggregate([
-    { $match: { email } },
-    {
-      $addFields: {
-        eventObjectId: {
-          $toObjectId: "$eventId",
+  const result = await joinedEventsCollection
+    .aggregate([
+      { $match: { email } },
+      {
+        $addFields: {
+          eventObjectId: {
+            $toObjectId: "$eventId",
+          },
         },
       },
-    },
-    {
-      $lookup: {
-        from: "events",
-        localField: "eventObjectId",
-        foreignField: "_id",
-        as: "event",
+      {
+        $lookup: {
+          from: "events",
+          localField: "eventObjectId",
+          foreignField: "_id",
+          as: "event",
+        },
       },
-    },
-    { $unwind: "$event" },
-    {
-      $project: {
-        _id: 1,
-        eventId: 1,
-        eventTitle: 1,
-        email: 1,
-        userId: 1,
-        joinedAt: 1,
-        title: "$event.title",
-        description: "$event.description",
-        eventType: "$event.eventType",
-        eventDate: "$event.eventDate",
-        location: "$event.location",
-        imageUrl: "$event.imageUrl",
+      { $unwind: "$event" },
+      {
+        $project: {
+          _id: 1,
+          eventId: 1,
+          eventTitle: 1,
+          email: 1,
+          userId: 1,
+          joinedAt: 1,
+          title: "$event.title",
+          description: "$event.description",
+          eventType: "$event.eventType",
+          eventDate: "$event.eventDate",
+          location: "$event.location",
+          imageUrl: "$event.imageUrl",
+        },
       },
-    },
-  ]);
+    ])
+    .toArray();
+  res.send(result);
+});
+
+// Get current users events
+app.get("/api/my-events", verifyToken, async (req, res) => {
+  const email = req.user.email.toLowerCase();
+  const result = await eventsCollection.find({ createdBy: email }).toArray();
+
+  res.send(result);
 });
 
 app.listen(port, () => {
