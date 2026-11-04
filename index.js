@@ -249,6 +249,22 @@ app.patch("/api/my-events/:id", verifyToken, async (req, res) => {
   res.send(result);
 });
 
+// Delete my Event
+app.delete("/api/my-events/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const email = req.user.email.toLowerCase();
+
+  const result = await eventsCollection.deleteOne({
+    _id: new ObjectId(id),
+    createdBy: email,
+  });
+  await joinedEventsCollection.deleteMany({
+    eventId: id,
+  });
+  res.send(result);
+});
+
+// Start Server
 app.listen(port, () => {
   console.log(`Impactora API running on port ${port}`);
 });
