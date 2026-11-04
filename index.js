@@ -97,23 +97,23 @@ app.get("/api/events/recent", async (req, res) => {
 });
 
 // Get All Upcoming Events
-// app.get("/api/events", async (req, res) => {
-//   try {
-//     const result = await eventsCollection
-//       .find({
-//         eventDate: { $gt: new Date().toISOString() },
-//       })
-//       .sort({ eventDate: 1 })
-//       .toArray();
+app.get("/api/events", async (req, res) => {
+  try {
+    const result = await eventsCollection
+      .find({
+        eventDate: { $gt: new Date().toISOString() },
+      })
+      .sort({ eventDate: 1 })
+      .toArray();
 
-//     res.send(result);
-//   } catch (error) {
-//     res.status(500).send({
-//       success: false,
-//       message: "Failed to get events!",
-//     });
-//   }
-// });
+    res.send(result);
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Failed to get events!",
+    });
+  }
+});
 
 // Get Signle event
 app.get("/api/events/:id", async (req, res) => {
