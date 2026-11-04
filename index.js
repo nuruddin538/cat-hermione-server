@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const app = express();
@@ -77,24 +77,24 @@ app.get("/", (req, res) => {
 });
 
 // Get 6 Upcoming Events
-// app.get("/api/events/recent", async (req, res) => {
-//   try {
-//     const result = await eventsCollection
-//       .find({
-//         eventDate: { $gt: new Date().toISOString() },
-//       })
-//       .sort({ eventDate: 1 })
-//       .limit(6)
-//       .toArray();
+app.get("/api/events/recent", async (req, res) => {
+  try {
+    const result = await eventsCollection
+      .find({
+        eventDate: { $gt: new Date().toISOString() },
+      })
+      .sort({ eventDate: 1 })
+      .limit(6)
+      .toArray();
 
-//     res.send(result);
-//   } catch (error) {
-//     res.status(500).send({
-//       success: false,
-//       message: "Failed to get recent events!",
-//     });
-//   }
-// });
+    res.send(result);
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Failed to get recent events!",
+    });
+  }
+});
 
 // Get All Upcoming Events
 // app.get("/api/events", async (req, res) => {
@@ -116,6 +116,14 @@ app.get("/", (req, res) => {
 // });
 
 // Get Signle event
+app.get("/api/events/:id", async (req, res) => {
+  const { id } = req.params;
+  const result = await eventsCollection.findOne({
+    _id: new ObjectId(id),
+  });
+  res.send(result);
+});
+// 6. Create E
 
 // Create Event
 app.post("/api/events", verifyToken, async (req, res) => {
