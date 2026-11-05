@@ -4,6 +4,8 @@ Impactora is a community service and social development platform that helps peop
 
 This repository contains the backend REST API for Impactora, built with Node.js, Express.js and MongoDB.
 
+
+
 ## 🚀 Features
 
 - **RESTful API:** Provides endpoints for managing community events.
